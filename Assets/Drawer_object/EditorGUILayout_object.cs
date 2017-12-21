@@ -26,9 +26,7 @@ namespace Drawer_object
             var changed = false;
             while ((iterator = iterator.NextVisible(enterChildren)) != null)
             {
-                EditorGUI.BeginDisabledGroup("m_Script" == iterator.propertyPath);
                 changed |= PropertyField(iterator, new GUILayoutOption[0]);
-                EditorGUI.EndDisabledGroup();
                 enterChildren = false;
             }
             if (changed)
@@ -45,96 +43,92 @@ namespace Drawer_object
 
         public static bool PropertyField(Serialized_property property, params GUILayoutOption[] options)
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(property.name, GUILayout.Width(100));
             EditorGUI.BeginChangeCheck();
-            property.value = DrawField(property.value);
-            EditorGUILayout.EndHorizontal();
 
+            if (property.hasChildren)
+            {
+                DrawClassObject(property);
+            }
+            else
+            {
+                DrawField(property);
+            }
             return EditorGUI.EndChangeCheck();
         }
+
         public static bool PropertyField(Serialized_property property, GUIContent label, params GUILayoutOption[] options)
         {
             return true;
         }
 
-        public static object DrawClassObject(FieldInfo field, object classItem, Dictionary<FieldInfo, bool> toggleDic, Dictionary<FieldInfo, List<FieldInfo>> fieldDic)
+        public static void DrawClassObject(Serialized_property property)
         {
-            if (classItem == null || toggleDic == null || fieldDic == null || !fieldDic.ContainsKey(field)) return null;
-
+            if (!property.hasChildren) return;
             EditorGUI.indentLevel++;
-            if (GUILayout.Button(classItem.GetType().Name, EditorStyles.boldLabel))
+
+            if (GUILayout.Button(property.name, EditorStyles.boldLabel))
             {
-                toggleDic[field] = !toggleDic[field];
+                property.isExpanded = !property.isExpanded;
             }
 
-            if (toggleDic[field])
+            if (property.isExpanded)
             {
-                foreach (var item in fieldDic[field])
+                var iterator = property;
+                var enterChildren = true;
+                while ((iterator = iterator.NextVisible(enterChildren)) != null)
                 {
-                    if (item.FieldType.IsValueType || item.FieldType == typeof(string))
-                    {
-                        EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField(item.Name, GUILayout.Width(100));
-                        item.SetValue(classItem, DrawField(item.GetValue(classItem)));
-                        EditorGUILayout.EndHorizontal();
-                    }
-                    else if (item.FieldType.IsGenericType || item.FieldType.IsArray) continue;
-                    else if (item.FieldType.IsClass && (item.FieldType != typeof(string)))
-                    {
-                        DrawClassObject(item, item.GetValue(classItem), toggleDic, fieldDic);
-                    }
+
+                    PropertyField(iterator, new GUILayoutOption[0]);
+                    enterChildren = false;
                 }
             }
-
-            return classItem;
         }
 
-        public static object DrawField(object data)
+        public static void DrawField(Serialized_property property)
         {
-            if (data is int)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(property.name, GUILayout.Width(100));
+            if (property.value is int)
             {
-                data = EditorGUILayout.IntField(Convert.ToInt32(data));
+                property.value = EditorGUILayout.IntField(Convert.ToInt32(property.value));
             }
-            else if (data is bool)
+            else if (property.value is bool)
             {
-                data = EditorGUILayout.Toggle(Convert.ToBoolean(data));
+                property.value = EditorGUILayout.Toggle(Convert.ToBoolean(property.value));
             }
-            else if (data is float || data is double)
+            else if (property.value is float || property.value is double)
             {
-                data = EditorGUILayout.FloatField(float.Parse(data.ToString()));
+                property.value = EditorGUILayout.FloatField(float.Parse(property.value.ToString()));
             }
-            else if (data is string)
+            else if (property.value is string)
             {
-                data = EditorGUILayout.TextField(data.ToString());
+                property.value = EditorGUILayout.TextField(property.value.ToString());
             }
-            else if (data is Color)
+            else if (property.value is Color)
             {
-                data = EditorGUILayout.ColorField((Color)data);
+                property.value = EditorGUILayout.ColorField((Color)property.value);
             }
-            else if (data is Enum)
+            else if (property.value is Enum)
             {
-                data = EditorGUILayout.EnumPopup((Enum)data);
+                property.value = EditorGUILayout.EnumPopup((Enum)property.value);
             }
-            else if (data is Vector2)
+            else if (property.value is Vector2)
             {
-                data = EditorGUILayout.Vector2Field("", (Vector2)data);
+                property.value = EditorGUILayout.Vector2Field("", (Vector2)property.value);
             }
-            else if (data is Vector3)
+            else if (property.value is Vector3)
             {
-                data = EditorGUILayout.Vector3Field("", (Vector3)data);
+                property.value = EditorGUILayout.Vector3Field("", (Vector3)property.value);
             }
-            else if (data is Vector4)
+            else if (property.value is Vector4)
             {
-                data = EditorGUILayout.Vector4Field("", (Vector4)data);
+                property.value = EditorGUILayout.Vector4Field("", (Vector4)property.value);
             }
-            else if (data is Rect)
+            else if (property.value is Rect)
             {
-                data = EditorGUILayout.RectField("", (Rect)data);
+                property.value = EditorGUILayout.RectField("", (Rect)property.value);
             }
-            return data;
+            EditorGUILayout.EndHorizontal();
         }
-
-
     }
 }

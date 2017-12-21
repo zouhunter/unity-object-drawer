@@ -25,7 +25,6 @@ public class HolderDrawer : Editor
         holder = target as HolderBehaiver;
         InitObject();
         serialize_obj = new Serialized_object(holder.GetType().GetField("content"),holder);
-        prop = serialize_obj.FindProperty("content");
         prop = serialize_obj.FindProperty("intTest");
     }
     private void InitObject()

@@ -28,7 +28,7 @@ namespace Drawer_object
 
         internal Serialized_property GetIterator()
         {
-            return obj_Prop.Copy();
+            return obj_Prop;
         }
 
         public void UpdateIfDirtyOrScript() { }

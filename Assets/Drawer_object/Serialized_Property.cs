@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Internal;
 using System.Reflection;
 using Debug = UnityEngine.Debug;
+using UnityEditor;
 
 namespace Drawer_object
 {
@@ -36,7 +37,7 @@ namespace Drawer_object
 
         public object value { get { return fieldInfo.GetValue(content); }set { fieldInfo.SetValue(content,value); } }
 
-        public bool isExpanded { get; set; }
+        public bool isExpanded = true;
 
         public string displayName { get { return name; } }
 
@@ -73,9 +74,9 @@ namespace Drawer_object
 
         public double doubleValue { get { return (propertyType == Serialized_propertyType.Float) ? (double)value : 0; } }
 
-        public string stringValue;
+        public string stringValue { get { return (propertyType == Serialized_propertyType.String) ? (string)value : null; } }
 
-        public Color colorValue { get { return new Color(); } }
+        public Color colorValue { get { return (propertyType == Serialized_propertyType.Color) ? (Color)value : Color.white; } } 
 
         public AnimationCurve animationCurveValue;
 
@@ -150,12 +151,17 @@ namespace Drawer_object
             if(type.IsClass && type != typeof(string))
             {
                 var value = field.GetValue(holder);
+
                 if(value != null)
                 {
                     FieldInfo[] fields = value.GetType().GetFields(BindingFlags.GetField | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic | BindingFlags.Public);
                     foreach (var item in fields)
                     {
-                        if (!IsFieldNeed(item)) continue;
+                        if (!IsFieldNeed(item))
+                        {
+                            Debug.Log("ignore:" + item.Name);
+                            continue;
+                        }
                        
                         var prop = new Serialized_property(item, value);
                         prop.SetParentProperty(this);
@@ -312,22 +318,11 @@ namespace Drawer_object
 
         public int CountInProperty() { return subProps == null ? 0 : subProps.Count; }
 
-        public Serialized_property Copy()
-        {
-            Serialized_property serializedProperty = new Serialized_property(fieldInfo, content);
-            serializedProperty.m_SerializedObject = this.m_SerializedObject;
-            return serializedProperty;
-        }
-
         public bool DuplicateCommand() { return false; }
 
         public bool DeleteCommand() { return false; }
 
-        public Serialized_property FindPropertyRelative(string relativePropertyPath)
-        {
-            Serialized_property serializedProperty = this.Copy();
-            return serializedProperty.FindPropertyRelativeInternal(relativePropertyPath);
-        }
+ 
 
         internal Serialized_property FindPropertyInternal(string propertyPath)
         {
@@ -354,16 +349,6 @@ namespace Drawer_object
         internal string[] GetLayerMaskNames() { return null; }
 
         internal void ToggleLayerMaskAtIndex(int index) { }
-
-        public Serialized_property GetArrayElementAtIndex(int index)
-        {
-            Serialized_property serializedProperty = this.Copy();
-            if (serializedProperty.GetArrayElementAtIndexInternal(index))
-            {
-                return serializedProperty;
-            }
-            return null;
-        }
 
         private bool GetArrayElementAtIndexInternal(int index) { return false; }
 
