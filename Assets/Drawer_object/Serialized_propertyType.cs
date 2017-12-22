@@ -22,7 +22,7 @@ namespace Drawer_object
         Bounds,
         Gradient,
         Quaternion,
-        Class,//Àà
+        Class,
         Dictionary,//×Öµä
     }
 }

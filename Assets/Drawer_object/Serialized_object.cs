@@ -5,49 +5,41 @@ using System.Reflection;
 
 namespace Drawer_object
 {
+    public class Serialized_object<T> : Serialized_object where T : class
+    {
+        private SerializedInstance<T> _instence;
+        public Serialized_object(SerializedInstance<T> instance):base(instance.Object)
+        {
+            this._instence = instance;
+        }
+        public void SetDirty()
+        {
+            _instence.Save();
+        }
+    }
+
     public class Serialized_object
     {
-        private Serialized_property obj_Prop;
+        protected Serialized_property obj_Prop;
 
-        public object targetObject { get; private set; }
+        protected object value;
 
-        internal bool hasModifiedProperties { get; private set; }
-
-        public Serialized_object(FieldInfo info,object holder)
+        public Serialized_object(object value)
         {
-            this.targetObject = holder;
-            obj_Prop = new Serialized_property(info,holder);
+            this.value = value;
+            FieldInfo info = typeof(Serialized_object).GetField("value", BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic);
+            obj_Prop = new Serialized_property(info, this);
             obj_Prop.serializedObject = this;
         }
-
-        public void Update() {
-
-        }
-
-        public void SetIsDifferentCacheDirty() { }
 
         internal Serialized_property GetIterator()
         {
             return obj_Prop;
         }
 
-        public void UpdateIfDirtyOrScript() { }
-
-        public void Dispose() { }
-
-        ~Serialized_object()
-        {
-            this.Dispose();
-        }
-
         public Serialized_property FindProperty(string propertyPath)
         {
             return obj_Prop.FindPropertyInternal(propertyPath);
         }
-
-        private  Property_modification ExtractPropertyModification(string propertyPath) { return null; }
-
-        
-        public  bool ApplyModifiedProperties() { return true; }
     }
 }

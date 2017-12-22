@@ -19,7 +19,7 @@ public abstract class ContentClass {
 public class ContentA: ContentClass
 {
     public int intTest;
-    public string stirngTest;
+    public string stringTest;
     public ContentB classTest;
 }
 
