@@ -34,11 +34,6 @@ namespace Drawer_object
 			}
 		}
 
-		public SerializedInstance() {
-			m_className = string.Empty;
-			m_instanceData = string.Empty;
-		}
-
 		public SerializedInstance(SerializedInstance<T> instance) {
 			m_className = instance.m_className;
 			m_instanceData = instance.m_instanceData;

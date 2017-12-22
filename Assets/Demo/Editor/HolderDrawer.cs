@@ -18,31 +18,22 @@ using Drawer_object;
 public class HolderDrawer : Editor
 {
     HolderBehaiver holder;
-    Serialized_object serialize_obj;
-    Serialized_property prop;
+    Serialized_object<ContentClass> serialize_obj;
+    Serialized_property intprop;
+    Serialized_property stringprop;
     private void OnEnable()
     {
         holder = target as HolderBehaiver;
-        InitObject();
-        serialize_obj = new Serialized_object(holder.GetType().GetField("content"),holder);
-        prop = serialize_obj.FindProperty("intTest");
-    }
-    private void InitObject()
-    {
-        if (!string.IsNullOrEmpty(holder.instenceData)){
-            var item = (ContentClass)JsonUtility.FromJson(holder.instenceData, holder.content.GetType());
-            if(item != null && item.GetType() == holder.content.GetType())
-            {
-                holder.content = item;
-            }
-        }
+        serialize_obj = new Serialized_object<ContentClass>(holder.content);
+        intprop = serialize_obj.FindProperty("intTest");
+        stringprop = serialize_obj.FindProperty("stringTest");
     }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        if(EditorGUILayout_object.Serialized_objectField(serialize_obj)){
-            holder.instenceData = JsonUtility.ToJson(holder.content);
-        }
-        
+        EditorGUILayout_object.Serialized_objectField(serialize_obj);
+        EditorGUILayout_object.PropertyField(intprop);
+        EditorGUILayout_object.PropertyField(stringprop);
+        serialize_obj.SetDirty();
     }
 }

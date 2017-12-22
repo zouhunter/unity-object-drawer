@@ -18,9 +18,8 @@ namespace Drawer_object
 {
     public static class EditorGUILayout_object
     {
-        public static bool Serialized_objectField(Serialized_object s_obj)
+        public static bool Serialized_objectField(Serialized_object s_obj, GUIContent label = null)
         {
-            s_obj.Update();
             Serialized_property iterator = s_obj.GetIterator();
             bool enterChildren = true;
             var changed = false;
@@ -29,25 +28,19 @@ namespace Drawer_object
                 changed |= PropertyField(iterator, new GUILayoutOption[0]);
                 enterChildren = false;
             }
-            if (changed)
-            {
-                s_obj.ApplyModifiedProperties();
-            }
             return changed;
         }
-
-        public static bool Serialized_objectField(Serialized_object s_obj, GUIContent label)
-        {
-            return Serialized_objectField(s_obj);
-        }
-
         public static bool PropertyField(Serialized_property property, params GUILayoutOption[] options)
         {
             EditorGUI.BeginChangeCheck();
 
-            if (property.hasChildren)
+            if (property.propertyType == Serialized_propertyType.Class)
             {
                 DrawClassObject(property);
+            }
+            if(property.propertyType == Serialized_propertyType.ArraySize)
+            {
+
             }
             else
             {
@@ -56,14 +49,10 @@ namespace Drawer_object
             return EditorGUI.EndChangeCheck();
         }
 
-        public static bool PropertyField(Serialized_property property, GUIContent label, params GUILayoutOption[] options)
-        {
-            return true;
-        }
-
         public static void DrawClassObject(Serialized_property property)
         {
             if (!property.hasChildren) return;
+
             EditorGUI.indentLevel++;
 
             if (GUILayout.Button(property.name, EditorStyles.boldLabel))
@@ -77,7 +66,6 @@ namespace Drawer_object
                 var enterChildren = true;
                 while ((iterator = iterator.NextVisible(enterChildren)) != null)
                 {
-
                     PropertyField(iterator, new GUILayoutOption[0]);
                     enterChildren = false;
                 }

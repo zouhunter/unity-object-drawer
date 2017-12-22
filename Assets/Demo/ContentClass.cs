@@ -19,9 +19,10 @@ public abstract class ContentClass {
 public class ContentA: ContentClass
 {
     public int intTest;
-    public string stirngTest;
-    public GameObject objectTest;
-    //public List<ContentA> classTest;
+    public string stringTest;
+    [ObjectReference]
+    public string objTest;
+    public ContentB classTest;
 }
 
 
