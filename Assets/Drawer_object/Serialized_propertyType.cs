@@ -4,6 +4,7 @@ namespace Drawer_object
 {
     public enum Serialized_propertyType
     {
+        Generic = -1,
         Integer,
         Boolean,
         Float,
@@ -22,7 +23,6 @@ namespace Drawer_object
         Bounds,
         Gradient,
         Quaternion,
-        Class,//Àà
         Dictionary,//×Öµä
     }
 }

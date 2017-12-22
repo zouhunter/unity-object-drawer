@@ -116,9 +116,13 @@ namespace Drawer_object
         {
             this.fieldInfo = info;
             this.content = holder;
+            this.propertyType = JudgePropertyType(info);
             subProps = GetSubPropopertys(fieldInfo, holder);
         }
-
+        ~Serialized_property()
+        {
+            this.Dispose();
+        }
         public void SetParentProperty(Serialized_property parent)
         {
             this.parentProp = parent;
@@ -245,10 +249,7 @@ namespace Drawer_object
             return true;
         }
 
-        ~Serialized_property()
-        {
-            this.Dispose();
-        }
+      
 
         public void Dispose() { }
 
@@ -310,20 +311,10 @@ namespace Drawer_object
             }
         }
 
-        public void Reset()
-        {
-        }
-
-        public int CountRemaining() { return parentProp.CountInProperty() - parentProp.subProps.IndexOf(this) - 1; }
-
-        public int CountInProperty() { return subProps == null ? 0 : subProps.Count; }
-
         public bool DuplicateCommand() { return false; }
 
         public bool DeleteCommand() { return false; }
-
- 
-
+        
         internal Serialized_property FindPropertyInternal(string propertyPath)
         {
             if (subProps != null)
@@ -352,9 +343,78 @@ namespace Drawer_object
 
         private bool GetArrayElementAtIndexInternal(int index) { return false; }
 
+        private static Serialized_propertyType JudgePropertyType(FieldInfo info)
+        {
+            var propertyType = Serialized_propertyType.Generic;
+            var type = info.FieldType;
+            if (Type.Equals(type,typeof(int))|| Type.Equals(type, typeof(long))|| Type.Equals(type, typeof(short)))
+            {
+                propertyType = Serialized_propertyType.Integer;
+            }
+            else if (Type.Equals(type, typeof(bool)))
+            {
+                propertyType = Serialized_propertyType.Boolean;
+            }
+            else if (Type.Equals(type, typeof(float))|| Type.Equals(type, typeof(double))|| Type.Equals(type, typeof(decimal)))
+            {
+                propertyType = Serialized_propertyType.Float;
+            }
+            else if (Type.Equals(type, typeof(string)))
+            {
+                propertyType = Serialized_propertyType.String;
+            }
+            else if (Type.Equals(type, typeof(Color)))
+            {
+                propertyType = Serialized_propertyType.Color;
+            }
+            else if (Type.Equals(type, typeof(Enum)))
+            {
+                propertyType = Serialized_propertyType.Enum;
+            }
+            else if (Type.Equals(type, typeof(LayerMask)))
+            {
+                propertyType = Serialized_propertyType.LayerMask;
+            }
+            else if (Type.Equals(type, typeof(Vector2)))
+            {
+                propertyType = Serialized_propertyType.Vector2;
+            }
+            else if (Type.Equals(type, typeof(Vector3)))
+            {
+                propertyType = Serialized_propertyType.Vector3;
+            }
+            else if (Type.Equals(type, typeof(Vector4)))
+            {
+                propertyType = Serialized_propertyType.Vector4;
+            }
+            else if (Type.Equals(type, typeof(Quaternion)))
+            {
+                propertyType = Serialized_propertyType.Quaternion;
+            }
+            else if (Type.Equals(type, typeof(Rect)))
+            {
+                propertyType = Serialized_propertyType.Rect;
+            }
+            else if (Type.Equals(type, typeof(Bounds)))
+            {
+                propertyType = Serialized_propertyType.Bounds;
+            }
+            else if (type.IsArrayOrList())
+            {
+                propertyType = Serialized_propertyType.ArraySize;
+            }
+            else if(type.IsSubclassOf(typeof(UnityEngine.Object)))
+                {
+                propertyType = Serialized_propertyType.ObjectReference;
+            }
+            else if (Type.Equals(type, typeof(AnimationCurve)))
+            {
+                propertyType = Serialized_propertyType.AnimationCurve;
+            }
+            return propertyType;
+        }
 
         public void InsertArrayElementAtIndex(int index) { }
-
 
         public void DeleteArrayElementAtIndex(int index) { }
 

@@ -43,5 +43,6 @@ public class HolderDrawer : Editor
         if(EditorGUILayout_object.Serialized_objectField(serialize_obj)){
             holder.instenceData = JsonUtility.ToJson(holder.content);
         }
+        
     }
 }

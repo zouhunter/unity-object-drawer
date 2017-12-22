@@ -20,7 +20,8 @@ public class ContentA: ContentClass
 {
     public int intTest;
     public string stirngTest;
-    public ContentB classTest;
+    public GameObject objectTest;
+    //public List<ContentA> classTest;
 }
 
 
