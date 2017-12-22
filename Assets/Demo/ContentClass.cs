@@ -20,6 +20,8 @@ public class ContentA: ContentClass
 {
     public int intTest;
     public string stringTest;
+    [ObjectReference]
+    public string objTest;
     public ContentB classTest;
 }
 
